@@ -1,0 +1,61 @@
+{
+  "id": "research.recall",
+  "version": "1.0",
+  "description": "Query prior captured and compiled knowledge. Results must carry provenance so every recalled item traces back to its original source.",
+  "steps": [
+    { "id": "form-query", "next": "retrieve-results" },
+    { "id": "retrieve-results", "next": "verify-provenance" },
+    { "id": "verify-provenance", "next": "done" },
+    { "id": "done", "next": null }
+  ],
+  "gates": {
+    "form-query-gate": {
+      "step": "form-query",
+      "expects": [
+        {
+          "id": "query-formed",
+          "kind": "surface.claim",
+          "required": true,
+          "description": "A query intent has been formed (keyword terms, topic, or semantic vector). The query scope (captured sources, compiled insights, or both) must be specified.",
+          "claim": {
+            "type": "research.recall.query",
+            "subject": "artifact",
+            "accepted_statuses": ["trusted", "accepted"]
+          }
+        }
+      ]
+    },
+    "retrieve-results-gate": {
+      "step": "retrieve-results",
+      "expects": [
+        {
+          "id": "results-retrieved",
+          "kind": "surface.claim",
+          "required": true,
+          "description": "Results matching the query have been retrieved from the knowledge store. An empty result set is valid; retrieval failure or timeout is not.",
+          "claim": {
+            "type": "research.recall.results",
+            "subject": "artifact",
+            "accepted_statuses": ["trusted", "accepted"]
+          }
+        }
+      ]
+    },
+    "verify-provenance-gate": {
+      "step": "verify-provenance",
+      "expects": [
+        {
+          "id": "results-carry-provenance",
+          "kind": "surface.claim",
+          "required": true,
+          "description": "Every non-empty result carries a provenance reference back to its originating captured source (source_id or source_ref). Results without traceable provenance must be excluded before this gate can pass.",
+          "claim": {
+            "type": "research.recall.provenance-verified",
+            "subject": "artifact",
+            "accepted_statuses": ["trusted", "accepted"]
+          }
+        }
+      ]
+    }
+  }
+}

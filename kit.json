@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "id": "research",
+  "name": "Research Kit",
+  "product_name": "Research Kit",
+  "description": "A Flow Kit for source-traced research workflows. Provides three flows covering the full capture-to-recall cycle: ingest a source with provenance (capture), compile captured sources into a gated insight note (compile), and query prior knowledge with provenance-verified results (recall).",
+  "flows": [
+    {
+      "id": "research.capture",
+      "path": "flows/research.capture.flow.json",
+      "description": "Ingest a source (transcript, article, URL) with provenance. Gate: source ref + classification recorded before advancing."
+    },
+    {
+      "id": "research.compile",
+      "path": "flows/research.compile.flow.json",
+      "description": "Compile captured sources into an insight note. Gate: provenance links to every contributing source must be recorded."
+    },
+    {
+      "id": "research.recall",
+      "path": "flows/research.recall.flow.json",
+      "description": "Query prior captured and compiled knowledge. Gate: every result must carry provenance back to its originating source."
+    }
+  ],
+  "docs": [
+    {
+      "id": "research.readme",
+      "path": "docs/README.md",
+      "description": "Research Kit overview, flow descriptions, Knowledge Kit substrate relationship, and authoring notes."
+    },
+    {
+      "id": "research.capture-skill",
+      "path": "skills/capture.md",
+      "description": "Agent skill guidance for the capture flow: how to extract source refs, choose classification categories, and record provenance."
+    },
+    {
+      "id": "research.compile-skill",
+      "path": "skills/compile.md",
+      "description": "Agent skill guidance for the compile flow: how to select sources, draft insight notes, and link provenance."
+    },
+    {
+      "id": "research.recall-skill",
+      "path": "skills/recall.md",
+      "description": "Agent skill guidance for the recall flow: how to form queries and verify provenance on results."
+    }
+  ],
+  "skills": [
+    {
+      "id": "research.capture-skill",
+      "path": "skills/capture.md",
+      "description": "Guidance for executing the capture flow: source ingestion, provenance extraction, and classification."
+    },
+    {
+      "id": "research.compile-skill",
+      "path": "skills/compile.md",
+      "description": "Guidance for executing the compile flow: source selection, insight drafting, and provenance linking."
+    },
+    {
+      "id": "research.recall-skill",
+      "path": "skills/recall.md",
+      "description": "Guidance for executing the recall flow: query formation and provenance verification."
+    }
+  ]
+}
