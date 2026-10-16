@@ -1,76 +1,52 @@
 # Research Kit
 
-A Flow Kit for source-traced research workflows. Three flows cover the full cycle from raw source ingestion to provenance-verified recall.
+**Status: EXPERIMENTAL prototype.** Research Kit explores source-traced research as a third-party Flow Kit. It was authored outside Flow Agents to exercise the authoring path in [flow-agents#50](https://github.com/kontourai/flow-agents/issues/50).
 
-## Flows
+This repository contains three flow definitions, a `kit.json` container manifest, and Markdown guidance. It supplies no store, ingestion service, retrieval implementation, provider adapter, or execution engine. Production use, provider behavior, and live activation are unverified here.
 
-| Flow | What it does | Key gate |
-|---|---|---|
-| `research.capture` | Ingest a source (transcript, article, URL) with provenance | Source ref + classification must be recorded |
-| `research.compile` | Compile captured sources into an insight note | Provenance links to every contributing source must be recorded |
-| `research.recall` | Query prior captured and compiled knowledge | Every result must carry provenance back to its originating source |
+## Flow contracts
 
-All three flows enforce provenance at the gate level. A source without a traceable reference cannot advance past `record-provenance`. A compiled note without source links cannot be stored. A recall result without provenance is excluded before the gate can pass.
+| Flow | Intent | Guidance |
+| --- | --- | --- |
+| `research.capture` | Receive a source, record provenance, classify it | [Capture skill](../skills/capture.md) |
+| `research.compile` | Select sources, draft an insight, record provenance links | [Compile skill](../skills/compile.md) |
+| `research.recall` | Form a query, retrieve results, verify provenance | [Recall skill](../skills/recall.md) |
 
-## Relationship to the Knowledge Kit
+Read the [source contracts and storage boundaries](contracts.md) before adapting the flows. Their gates declare required claims. A compatible host must evaluate those claims and enforce progression; reading or installing the definitions does not prove enforcement or source truth.
 
-The Research Kit defines the **workflow contract** (gates, steps, evidence expectations). It does not define a store implementation.
+## Try the prototype from source
 
-If a workspace has the [Knowledge Kit](https://kontourai.github.io/flow-agents/knowledge-kit) installed, the Research Kit composes naturally on top of it:
-
-- `research.capture` captured sources → Knowledge Kit `type='raw'` records
-- `research.compile` compiled insights → Knowledge Kit `type='compiled'` records
-- `research.recall` queries → Knowledge Kit store `listByType`, `listByCategory`, `get()` operations
-
-The Knowledge Kit's store contract (provenance requirements, mutation gates, supersede-not-delete invariant) is the substrate. The Research Kit adds the workflow gates that govern when an agent may write to or read from that substrate.
-
-Neither kit imports the other's code. They compose through the shared store interface and the shared concept of `source_id` provenance references. Zero vendor lock-in between kits.
-
-## Skills
-
-The `skills/` directory contains agent guidance for each flow:
-
-- `skills/capture.md` — how to extract source refs, choose classification categories, and record provenance
-- `skills/compile.md` — how to select sources, draft insight notes, and link provenance
-- `skills/recall.md` — how to form queries and verify provenance on results
-
-Skills are markdown guidance assets. They are listed in `kit.json` under both `skills` and `docs` so that any runtime that surfaces docs to agents will also surface skill guidance.
-
-## Activation
-
-Install into a workspace via the flow-agents kit tooling:
+Use Node.js 22 or later and the pinned pnpm 11.25.0. Check out a reviewed kit revision before installing its development tooling:
 
 ```sh
-npx @kontourai/flow-agents flow-kit install-local /path/to/kit-research --dest /your/workspace
-npx @kontourai/flow-agents flow-kit activate --dest /your/workspace --format json
+git clone https://github.com/kontourai/kit-research.git
+cd kit-research
+git checkout <reviewed-research-kit-commit>
+pnpm install --frozen-lockfile
+npm run validate
+npm run validate:install
 ```
 
-Or from a git ref (once remote install is available — see FINDINGS.md):
+`validate` checks the container and all three definitions with the local published `@kontourai/flow@5.2.0` CLI. `validate:install` archives committed HEAD into a disposable local source, installs it under an owned temporary destination with `flow kit install`, verifies all declared asset bytes, inspects flow IDs and structural asset-class names, and validates the installed definitions. Its temporary HOME/config/cache/destination are removed on exit. It does not install into an existing workspace or activate any runtime.
+
+For a manual structural inspection of an isolated installation:
 
 ```sh
-# Remote install is not yet supported in the end-user path. See FINDINGS.md.
+research_scratch="$(mktemp -d "${TMPDIR:-/tmp}/research-kit.XXXXXX")"
+mkdir -p "$research_scratch/source"
+git archive HEAD | tar -xf - -C "$research_scratch/source"
+node node_modules/@kontourai/flow/dist/cli.js kit install "$research_scratch/source" --dest "$research_scratch/install"
+node node_modules/@kontourai/flow/dist/cli.js kit inspect "$research_scratch/install/research" --json
 ```
 
-After activation, the three flow definitions appear in `.flow-agents/runtime/codex/flows/research/`. The `codex-local` adapter reads them for Claude Code, Codex, and Kiro. The `strands-local` adapter reads the same activation output for AWS Strands workloads.
+Flow copies a kit container as-is and reports structure. Archiving HEAD prevents local dependencies and untracked files from becoming assets. `kit inspect` lists `docs` and `skills` as declared asset classes; it does not load them into an agent or qualify their runtime behavior. Remove the disposable directory after inspection. Execution requires a separately configured host, real claim evidence, and a store.
 
-Skills and docs are listed as `skipped_assets` in the activation output — they are declared but not yet activated by any adapter. See FINDINGS.md, Finding F-4.
+## Evidence limits
 
-## Validation
+The definitions use version `1.1` and Flow's current `trust.bundle` / `bundle_claim` selectors. Local checks against published Flow 5.2.0 establish container/definition acceptance and isolated local install/inspection, not gate enforcement, source truth, store durability, provider execution, or live activation. The [maintenance guide](maintenance.md) describes the exact checks and failure control. The Kit Validation workflow runs that same pinned path on Node 22 and 24; hosted results must be checked separately.
 
-To validate the kit's container manifest against the [Flow Kit container contract](https://kontourai.github.io/flow/flow-kit-container):
+[FINDINGS.md](../FINDINGS.md) preserves the original third-party authoring report and five friction findings from `@kontourai/flow-agents@0.4.0`. Its validation/runtime-file observations and “fully functional” verdict belong to that historical experiment. Those commands are not the current supported validation route. The former CI cloned moving Flow source, used obsolete `validate-kit` / Flow Agents commands, and caught activation failures; that history cannot qualify this migration or any provider.
 
-```sh
-# Using the @kontourai/flow CLI (requires a flow repo build):
-node /path/to/flow/dist/cli.js validate-kit /path/to/kit-research --json
+## Maintain the documentation
 
-# Using the flow-agents validate script in this repo:
-./validate.sh
-```
-
-The `validate.sh` script at the kit root also runs `flow validate-definition` on each flow file.
-
-## Authoring notes
-
-This kit was authored as a third-party kit outside the `kontourai/flow-agents` monorepo to exercise the end-user authoring path and surface integration gaps. Findings are indexed in [FINDINGS.md](../FINDINGS.md) with links to the resulting `kontourai/flow-agents` issues.
-
-**Zero imports of flow-agents code.** This kit contains only Flow Definitions (`.flow.json`), a manifest (`kit.json`), skill guidance (`.md`), and this documentation. No `require()` or `import` of any flow-agents internal. The contract boundary is the published `kit.json` schema and the flow CLI's `validate-kit` command.
+See [validation and maintenance](maintenance.md) for source validation, the pinned Corpus commands, source ownership, and the distinction between local docs builds and live Pages or MCP activation.

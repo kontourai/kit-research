@@ -2,3 +2,4 @@ node_modules/
 .npm/
 *.tgz
 /dist/
+/dist-pages/

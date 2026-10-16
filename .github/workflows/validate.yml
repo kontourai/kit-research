@@ -5,90 +5,33 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  validate-container:
-    name: Flow Kit container validation
+  validate:
+    name: Flow 5.2.0 contracts (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
     steps:
-      - name: Checkout kit-research
+      - name: Checkout Research Kit
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+      - name: Set up pinned pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-
-      - name: Clone and build kontourai/flow
-        run: |
-          git clone --depth 1 https://github.com/kontourai/flow.git /tmp/flow-cli
-          cd /tmp/flow-cli
-          npm ci
-          npm run build
-
-      - name: flow validate-kit (container contract)
-        run: |
-          node /tmp/flow-cli/dist/cli.js validate-kit . --json | tee /tmp/kit-validation.json
-          node -e "
-            const r = require('/tmp/kit-validation.json');
-            if (!r.valid) { console.error('container validation failed:', r.diagnostics); process.exit(1); }
-            console.log('container valid, error_count:', r.error_count);
-          "
-
-      - name: flow validate-definition (all flows)
-        run: |
-          failed=0
-          for f in flows/*.flow.json; do
-            echo "--- $f ---"
-            node /tmp/flow-cli/dist/cli.js validate-definition "$f" --json | tee /tmp/def-result.json
-            valid=$(node -e "console.log(require('/tmp/def-result.json').valid)")
-            if [ "$valid" != "true" ]; then
-              echo "FAIL: $f"
-              failed=$((failed + 1))
-            fi
-          done
-          if [ "$failed" -ne 0 ]; then exit 1; fi
-          echo "All flow definitions valid."
-
-  install-and-activate:
-    name: Install + activate via published @kontourai/flow-agents
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout kit-research
-        uses: actions/checkout@v4
-        with:
-          path: kit-research
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Create scratch workspace
-        run: mkdir -p /tmp/scratch-workspace
-
-      - name: Install kit from local path (end-user path via npx published package)
-        # NOTE: Flow CLI validation warning is expected here — the published package
-        # ships without the @kontourai/flow CLI. See FINDINGS.md F-2.
-        run: |
-          npx @kontourai/flow-agents flow-kit install-local "$PWD/kit-research" --dest /tmp/scratch-workspace
-
-      - name: Confirm install via list + status
-        run: |
-          npx @kontourai/flow-agents flow-kit list --dest /tmp/scratch-workspace
-          npx @kontourai/flow-agents flow-kit status research --dest /tmp/scratch-workspace
-
-      - name: Activate (codex-local adapter)
-        # NOTE: exits 1 without --source-root because activate looks for kits/catalog.json
-        # relative to the npx package root. --source-root is undocumented. See FINDINGS.md F-3.
-        run: |
-          npx @kontourai/flow-agents flow-kit activate --dest /tmp/scratch-workspace --format json \
-            || echo "WARNING: activate exited non-zero (known friction F-3 — catalog.json missing in npx context)"
-
-      - name: Verify runtime files exist
-        run: |
-          ls /tmp/scratch-workspace/.flow-agents/runtime/codex/flows/research/
-          test -f /tmp/scratch-workspace/.flow-agents/runtime/codex/flows/research/research.capture.flow.json
-          test -f /tmp/scratch-workspace/.flow-agents/runtime/codex/flows/research/research.compile.flow.json
-          test -f /tmp/scratch-workspace/.flow-agents/runtime/codex/flows/research/research.recall.flow.json
-          echo "All three runtime flow files present."
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - name: Install pinned validation tooling
+        run: pnpm install --frozen-lockfile
+      - name: Validate container and all definitions
+        run: npm run validate
+      - name: Isolated local kit install and structural inspection
+        run: npm run validate:install
