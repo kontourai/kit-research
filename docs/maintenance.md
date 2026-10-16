@@ -49,4 +49,4 @@ npm run docs:build
 npm run docs:check -- --base <review-base-commit>
 ```
 
-Both scripts pin Corpus commit `340b66fc8f723c1babe35fce8240c82cd196b0db`. The default output is ignored `dist-pages/`, including a source-bound `docs-bundle.json` for Corpus consumers such as MCP. The Docs workflow gates PRs and merge groups; main pushes and dispatches can deploy Pages after the gate once repository Pages is configured. Local output does not establish live deployment, catalog inclusion, or an active MCP connection.
+Both scripts pin Corpus commit `b8ecf4cd4c6482bb804cdeea617ebe2d9b78ab05`. This renderer wraps long inline text within narrow pages while wide code and tables retain local scrolling. The default output is ignored `dist-pages/`, including a source-bound `docs-bundle.json` for Corpus consumers such as MCP. The Docs workflow gates PRs and merge groups; main pushes and dispatches can deploy Pages after the gate once repository Pages is configured. Local output does not establish live deployment, catalog inclusion, or an active MCP connection.
