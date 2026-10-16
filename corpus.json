@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "product": "kit-research",
+  "title": "Research Kit",
+  "tagline": "An experimental Flow Kit for source-traced research.",
+  "purpose": "Explore capture, compilation, and recall contracts with explicit provenance expectations and honest limits on execution evidence.",
+  "builtOn": [],
+  "repo": "kontourai/kit-research",
+  "landing": "docs/README.md",
+  "allowLocalPaths": ["FINDINGS.md"],
+  "documents": [
+    {
+      "source": "README.md",
+      "section": "Start Here"
+    },
+    {
+      "source": "docs/contracts.md",
+      "section": "Reference",
+      "covers": [
+        "kit.json",
+        "flows/**",
+        "skills/**"
+      ]
+    },
+    {
+      "source": "docs/maintenance.md",
+      "section": "Contribute",
+      "covers": [
+        "validate.sh",
+        ".github/workflows/**"
+      ]
+    },
+    {
+      "source": "skills/capture.md",
+      "section": "Skill Guidance"
+    },
+    {
+      "source": "skills/compile.md",
+      "section": "Skill Guidance"
+    },
+    {
+      "source": "skills/recall.md",
+      "section": "Skill Guidance"
+    },
+    {
+      "source": "FINDINGS.md",
+      "section": "Authoring Evidence",
+      "title": "Historical third-party authoring findings"
+    }
+  ],
+  "topics": [
+    {
+      "id": "status",
+      "title": "Experimental status and scope",
+      "source": "docs/README.md"
+    },
+    {
+      "id": "flows",
+      "title": "Capture, compile, and recall contracts",
+      "source": "docs/README.md#flow-contracts"
+    },
+    {
+      "id": "storage",
+      "title": "Skills and storage boundaries",
+      "source": "docs/contracts.md#claims-and-storage"
+    },
+    {
+      "id": "install",
+      "title": "Try the prototype from source",
+      "source": "docs/README.md#try-the-prototype-from-source"
+    },
+    {
+      "id": "capture",
+      "title": "Capture skill guidance",
+      "source": "skills/capture.md"
+    },
+    {
+      "id": "compile",
+      "title": "Compile skill guidance",
+      "source": "skills/compile.md"
+    },
+    {
+      "id": "recall",
+      "title": "Recall skill guidance",
+      "source": "skills/recall.md"
+    },
+    {
+      "id": "validation",
+      "title": "Validate source and interpret evidence",
+      "source": "docs/maintenance.md#validate-the-source"
+    },
+    {
+      "id": "findings",
+      "title": "Historical friction findings",
+      "source": "FINDINGS.md"
+    },
+    {
+      "id": "maintenance",
+      "title": "Maintain and build the docs",
+      "source": "docs/maintenance.md"
+    }
+  ]
+}
