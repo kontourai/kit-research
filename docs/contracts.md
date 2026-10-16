@@ -22,8 +22,12 @@ The [recall skill](../skills/recall.md) asks the agent to exclude results withou
 
 ## Claims and storage
 
-All nine gate expectations are required `surface.claim` entries on an `artifact`, accepting `trusted` or `accepted` status. A compatible host must evaluate the claims, bind them to the right artifact, and enforce progression. A valid definition alone does not establish any of that behavior.
+All nine gate expectations are required `trust.bundle` entries. Each `bundle_claim` selector names its original research `claimType`, `subjectType: "artifact"`, and accepted statuses `trusted` or `accepted`. Definition version `1.1` migrates the old `surface.claim` / `claim.type` / `claim.subject` spelling to the Flow 5.2.0 contract; step order, gate IDs, descriptions, required flags, and accepted statuses are unchanged.
+
+A compatible host must supply valid trust bundles, bind claims to the right artifact, evaluate their trust, and enforce progression. The selectors specify an artifact subject type, not a concrete subject ID or a store implementation. Schema acceptance alone does not prove that evidence is true or that gates were enforced. This kit supplies no producer that generates those claims.
 
 The skills describe an optional Knowledge Kit mapping: captured sources to `type='raw'`, compiled insights to `type='compiled'`, and recall through a workspace store. This is an authoring relationship, not a tested store integration. Confirm the selected store's current API, provenance requirements, and history visibility before adapting the guidance, including its historical `includeRetired` wording.
 
-Neither a Knowledge Kit dependency nor a Corpus store adapter is declared here. The kit has no npm dependency manifest; `corpus.json` uses `builtOn: []` rather than inventing a verified package dependency. [Flow](https://github.com/kontourai/flow) defines the container/definition contracts, [Flow Agents](https://github.com/kontourai/flow-agents) supplies the experimental install/activation tooling, and [Corpus](https://github.com/kontourai/corpus) projects this documentation. None of those relationships proves runtime integration.
+The private root tooling package pins `@kontourai/flow` to `5.2.0` for validation and an isolated local install/inspection check. `corpus.json` declares that verified Flow relationship in `builtOn`. This package is not published and gives the kit no npm release version.
+
+Neither a Knowledge Kit dependency nor a Corpus store adapter is declared here. [Flow Agents](https://github.com/kontourai/flow-agents) remains a historical authoring/activation relationship, without current runtime qualification. [Corpus](https://github.com/kontourai/corpus) projects this documentation. The kit does not import Flow Agents or a Knowledge package, and no provider or store integration is established.

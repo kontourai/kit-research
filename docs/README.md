@@ -16,30 +16,36 @@ Read the [source contracts and storage boundaries](contracts.md) before adapting
 
 ## Try the prototype from source
 
-Use a disposable workspace and an explicit Research Kit revision. These commands reproduce the tool version recorded in the [authoring findings](../FINDINGS.md); they are an experimental path, not a claim that this version is current or qualified. Prerequisites are Git, Node.js, npm, network access, and a reviewed Flow Agents package.
+Use Node.js 22 or later and the pinned pnpm 11.25.0. Check out a reviewed kit revision before installing its development tooling:
 
 ```sh
 git clone https://github.com/kontourai/kit-research.git
 cd kit-research
 git checkout <reviewed-research-kit-commit>
-research_kit_root="$PWD"
-research_workspace="$(mktemp -d "${TMPDIR:-/tmp}/research-kit.XXXXXX")"
-
-npm exec --yes --package=@kontourai/flow-agents@0.4.0 -- flow-agents flow-kit install-local "$research_kit_root" --dest "$research_workspace"
-npm exec --yes --package=@kontourai/flow-agents@0.4.0 -- flow-agents flow-kit list --dest "$research_workspace"
-npm exec --yes --package=@kontourai/flow-agents@0.4.0 -- flow-agents flow-kit status research --dest "$research_workspace"
-npm exec --yes --package=@kontourai/flow-agents@0.4.0 -- flow-agents flow-kit activate --dest "$research_workspace" --format json
+pnpm install --frozen-lockfile
+npm run validate
+npm run validate:install
 ```
 
-Inspect the actual exit status, `errors`, `skipped_assets`, adapter output, and copied bytes. The earlier experiment observed flow files under `.flow-agents/runtime/codex/flows/research/` and `.flow-agents/runtime/strands/flows/research/`; file presence proves copying only. It does not prove a provider loaded or executed a flow. This repository supplies no flow-execution command: execution requires a separately configured host, claim evidence, and store.
+`validate` checks the container and all three definitions with the local published `@kontourai/flow@5.2.0` CLI. `validate:install` archives committed HEAD into a disposable local source, installs it under an owned temporary destination with `flow kit install`, verifies all declared asset bytes, inspects flow IDs and structural asset-class names, and validates the installed definitions. Its temporary HOME/config/cache/destination are removed on exit. It does not install into an existing workspace or activate any runtime.
 
-The historical `0.4.0` activation could exit non-zero despite writing files because a catalog was missing in the npm cache context ([F-3](../FINDINGS.md#f-3-activate-exits-1-in-npx-context--catalogjson-false-failure)). Treat that as failed activation with partial output. The findings also reported local-only installation and skipped skill/doc activation. Check current tooling and issue status before drawing conclusions about newer versions.
+For a manual structural inspection of an isolated installation:
+
+```sh
+research_scratch="$(mktemp -d "${TMPDIR:-/tmp}/research-kit.XXXXXX")"
+mkdir -p "$research_scratch/source"
+git archive HEAD | tar -xf - -C "$research_scratch/source"
+node node_modules/@kontourai/flow/dist/cli.js kit install "$research_scratch/source" --dest "$research_scratch/install"
+node node_modules/@kontourai/flow/dist/cli.js kit inspect "$research_scratch/install/research" --json
+```
+
+Flow copies a kit container as-is and reports structure. Archiving HEAD prevents local dependencies and untracked files from becoming assets. `kit inspect` lists `docs` and `skills` as declared asset classes; it does not load them into an agent or qualify their runtime behavior. Remove the disposable directory after inspection. Execution requires a separately configured host, real claim evidence, and a store.
 
 ## Evidence limits
 
-[FINDINGS.md](../FINDINGS.md) preserves the original third-party authoring report and five friction findings. Its validation and runtime-file observations belong to that experiment. The report's “fully functional” wording and final verdict are historical conclusions, not current production evidence.
+The definitions use version `1.1` and Flow's current `trust.bundle` / `bundle_claim` selectors. Local checks against published Flow 5.2.0 establish container/definition acceptance and isolated local install/inspection, not gate enforcement, source truth, store durability, provider execution, or live activation. The [maintenance guide](maintenance.md) describes the exact checks and failure control. The Kit Validation workflow runs that same pinned path on Node 22 and 24; hosted results must be checked separately.
 
-The existing [Kit Validation workflow](https://github.com/kontourai/kit-research/blob/main/.github/workflows/validate.yml) builds a moving Flow `main` and invokes an unpinned Flow Agents package. Its activation step catches a non-zero exit before checking file presence. A green workflow therefore cannot establish clean activation or provider execution. This documentation adoption does not requalify that experiment or change flow logic.
+[FINDINGS.md](../FINDINGS.md) preserves the original third-party authoring report and five friction findings from `@kontourai/flow-agents@0.4.0`. Its validation/runtime-file observations and “fully functional” verdict belong to that historical experiment. Those commands are not the current supported validation route. The former CI cloned moving Flow source, used obsolete `validate-kit` / Flow Agents commands, and caught activation failures; that history cannot qualify this migration or any provider.
 
 ## Maintain the documentation
 

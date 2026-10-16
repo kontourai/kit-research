@@ -4,7 +4,13 @@
   "title": "Research Kit",
   "tagline": "An experimental Flow Kit for source-traced research.",
   "purpose": "Explore capture, compilation, and recall contracts with explicit provenance expectations and honest limits on execution evidence.",
-  "builtOn": [],
+  "builtOn": [
+    {
+      "product": "flow",
+      "via": "@kontourai/flow",
+      "for": "Validate the kit and flow definitions and verify isolated local kit installation with the pinned public CLI."
+    }
+  ],
   "repo": "kontourai/kit-research",
   "landing": "docs/README.md",
   "allowLocalPaths": ["FINDINGS.md"],
@@ -27,6 +33,9 @@
       "section": "Contribute",
       "covers": [
         "validate.sh",
+        "scripts/**",
+        "package.json",
+        "pnpm-lock.yaml",
         ".github/workflows/**"
       ]
     },

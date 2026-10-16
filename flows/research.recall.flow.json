@@ -1,6 +1,6 @@
 {
   "id": "research.recall",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Query prior captured and compiled knowledge. Results must carry provenance so every recalled item traces back to its original source.",
   "steps": [
     { "id": "form-query", "next": "retrieve-results" },
@@ -14,12 +14,12 @@
       "expects": [
         {
           "id": "query-formed",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "A query intent has been formed (keyword terms, topic, or semantic vector). The query scope (captured sources, compiled insights, or both) must be specified.",
-          "claim": {
-            "type": "research.recall.query",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.recall.query",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
@@ -30,12 +30,12 @@
       "expects": [
         {
           "id": "results-retrieved",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "Results matching the query have been retrieved from the knowledge store. An empty result set is valid; retrieval failure or timeout is not.",
-          "claim": {
-            "type": "research.recall.results",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.recall.results",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
@@ -46,12 +46,12 @@
       "expects": [
         {
           "id": "results-carry-provenance",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "Every non-empty result carries a provenance reference back to its originating captured source (source_id or source_ref). Results without traceable provenance must be excluded before this gate can pass.",
-          "claim": {
-            "type": "research.recall.provenance-verified",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.recall.provenance-verified",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }

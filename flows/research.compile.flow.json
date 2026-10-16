@@ -1,6 +1,6 @@
 {
   "id": "research.compile",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Compile captured sources into an insight note. The gate requires provenance back to every contributing source so the note is never detached from evidence.",
   "steps": [
     { "id": "select-sources", "next": "draft-insight" },
@@ -14,12 +14,12 @@
       "expects": [
         {
           "id": "source-ids-selected",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "One or more captured source IDs have been selected for compilation. Each ID must resolve to an existing captured source record.",
-          "claim": {
-            "type": "research.compile.source-selection",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.compile.source-selection",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
@@ -30,12 +30,12 @@
       "expects": [
         {
           "id": "insight-drafted",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "An insight note has been drafted that synthesises the selected sources. The note is not yet stored; this gate confirms the draft exists and is non-trivial.",
-          "claim": {
-            "type": "research.compile.insight-draft",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.compile.insight-draft",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
@@ -46,12 +46,12 @@
       "expects": [
         {
           "id": "provenance-links-recorded",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "The compiled insight note has been stored with provenance.source_ids listing every contributing captured source ID. Every source ref must be resolvable. No insight may be stored without traceable provenance to its sources.",
-          "claim": {
-            "type": "research.compile.provenance-links",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.compile.provenance-links",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }

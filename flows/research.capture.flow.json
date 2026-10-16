@@ -1,6 +1,6 @@
 {
   "id": "research.capture",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Ingest a source (transcript, article, URL) with provenance. Gates require the source reference and classification to be recorded before advancing.",
   "steps": [
     { "id": "receive-source", "next": "record-provenance" },
@@ -14,12 +14,12 @@
       "expects": [
         {
           "id": "source-content-received",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "The source text, URL, or transcript has been received and is non-empty.",
-          "claim": {
-            "type": "research.capture.source-received",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.capture.source-received",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
@@ -30,12 +30,12 @@
       "expects": [
         {
           "id": "source-ref-recorded",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "The source reference (URL, citation, or attribution) has been recorded. A source without a traceable ref must not advance.",
-          "claim": {
-            "type": "research.capture.provenance-ref",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.capture.provenance-ref",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
@@ -46,12 +46,12 @@
       "expects": [
         {
           "id": "classification-recorded",
-          "kind": "surface.claim",
+          "kind": "trust.bundle",
           "required": true,
           "description": "The source has been classified with a non-empty category (e.g. 'transcript', 'article', 'reference', 'discussion') and a content-type label. Classification must be stored alongside the provenance ref.",
-          "claim": {
-            "type": "research.capture.classification",
-            "subject": "artifact",
+          "bundle_claim": {
+            "claimType": "research.capture.classification",
+            "subjectType": "artifact",
             "accepted_statuses": ["trusted", "accepted"]
           }
         }
